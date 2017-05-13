@@ -91,6 +91,4 @@ I9UW6c8ZiByQek6xXA419ML0ljeTIau3xwWnYpdHKag0
 
 ## LICENSE
 
-基于GPLv3协议和[不作恶]附加协议开源。
-
-[不作恶]附加协议内容在`LICENSE.additional`文件中。
+GPLv3
