@@ -37,7 +37,7 @@ YourRansom 将配置存储在二进制文件中，但并不是直接存储原数
 执行：
 
 ```
-$ ./confGen MyRansom example.json
+$ ./confGen 配置文件加密密钥 example.json
 
 ```
 
