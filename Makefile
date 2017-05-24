@@ -9,4 +9,4 @@ clean:
 	rm -rf dists
 
 upx:
-    upx dists/*
+	upx dists/*
