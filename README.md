@@ -45,6 +45,7 @@ YourRansom 将配置存储在二进制文件中，但并不是直接存储原数
 | ReadmeUrl | 在线readme的下载地址 | 留空表示不启用在线readme下载 |
 | ReadmeNetFilename | 在线readme的存储文件名 |
 | EncSuffix | 指定要被加密的文件后缀 | 格式为`后缀1\|后缀2\|后缀3` |
+| SkipHidden | 是否跳过隐藏文件(仅Windows) | 可以过部分诱饵式反勒索工具 |
 
 执行：
 

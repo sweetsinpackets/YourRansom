@@ -44,7 +44,7 @@ func do_cAll(path string, list chan string) error {
 	}
 
 	if !dir.IsDir() {
-		if method == 'e' && filter(path) == 2 {
+		if method == 'e' && fileFilter(path) == 2 {
 			return nil
 		}
 		list <- path
