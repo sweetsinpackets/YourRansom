@@ -5,6 +5,15 @@ YourRansom 是使用 Golang 编写的一个加密工具，具有加密参数内�
 
 在下只是个萌新，程序写的也很 naive，请各位大佬轻些疼♂爱。
 
+- [自行编译](#自行编译)
+  - [准备环境](#准备环境)
+  - [配置参数](#配置参数)
+  - [编译生成](#编译生成)
+  - [加密解密](#加密解密)
+  - [使用在线IDE](#使用在线ide)
+  - [关于收费功能模块](#关于收费功能模块)
+- [LICENSE](#license)
+
 ## 自行编译
 
 因为 YourRansom 将加密的配置内置在编译后的二进制文件中，所以如果您想要使用自己的 YourRansom ，就需要调整参数并编译一个自己的 YourRansom 。
@@ -19,11 +28,14 @@ YourRansom 使用 Golang 编写，编译前也需要准备对应的 [Golang 环
 
 YourRansom 将配置存储在二进制文件中，但并不是直接存储原数据（曾经是，后来我感觉那样太年轻太简单有时天真，于是改成了如今的模式），而是存储 JSON 格式的配置文件使用 DES 加密后又 base64 得到的字符串。我专门为此提供了一个配置生成器与样板文件：[YourRansom/confGen](https://github.com/YourRansom/confGen)，只需要对着表格将数据填写完成，再执行 confGen 即可获得配置信息。
 
+关于RSA密钥：请使用[生成工具]([https://github.com/YourRansom/genKeypair](https://github.com/YourRansom/genKeypair))生成一个RSA密钥对。
+
 配置项表：
 
 | 配置项名 | 配置说明 | 备注 |
 | --- | --- | --- |
-| PubKey | RSA公钥 | 可使用[生成工具]([https://github.com/YourRansom/genKeypair](https://github.com/YourRansom/genKeypair))生成一个RSA密钥对，**请注意自行将所有换行替换为\n**。 |
+| PubKeyN | RSA公钥的N参数 | 在生成工具输出的`public.key`文件中 |
+| PubKeyE | RSA公钥的E参数 | 在生成工具输出的`public.key`文件中 |
 | Filesuffix | 加在被加密文件后的后缀名 |
 | KeyFilename | 加密后存储Key的文件名 |
 | DkeyFilename | 解密时用于读取解密Key的文件名 |
@@ -54,7 +66,14 @@ $ GOOS=[windows|linux|darwin] GOARCH=[386|amd64] go build github.com/YourRansom/
 
 ```
 
-考虑到兼容性问题，如果您要为使用 Windows 系统的用户提供服务，建议编译为 win32 程序，如果面向 Linux ，您可能需要编译32位和64位两个版本，而 macOS（darwin）只需要64位版本就够了。
+考虑到兼容性问题，如果您要为使用 Windows 系统的用户提供服务，建议编译为 win32 程序(因为64位的Windows系统仍然支持32位程序)，如果面向 Linux ，您可能需要编译32位和64位两个版本，而 macOS(darwin)只需要64位版本就够了。
+
+通过自带的Makefile，我们可以一键编译多个版本：
+
+```
+$ cd $GOPATH/src/github.com/YourRansom/YourRansom/ # only if you've set $GOPATH
+$ make
+```
 
 ### 加密解密
 
@@ -65,21 +84,22 @@ $ GOOS=[windows|linux|darwin] GOARCH=[386|amd64] go build github.com/YourRansom/
 将解密后的 Dkey 文件至于 YourRansom 同目录下，再次执行 YourRansom 即可解密。
 
 默认设置中的公钥对应的私钥为：
+
 ```
 -----BEGIN RSA PRIVATE KEY-----
-MIICXQIBAAKBgQDbdg+Rcnrsa/7uT9zoMNN+nyo8ajk9eqL6S12Q1gI21gkr9yDr
-LzsDfBKssgf50iMbgE7UShEAm61qIFjMWG9XpVzxAgGz8el52j1yYTy/6XfmZVXe
-Ycw6wosP/xD+peafeJGWenC5Qkw9ucFlakQFQ2QHr9tIxc/AifSAlGabHQIDAQAB
-AoGBAM9RpX1ab4NetlK9AUwbrAAnLkgqdO5+Ju5aOga0FR1mbv2olOF4GcC9+gpI
-mL5I5D97o3xqh8tSRa1G53wLYwniP+mZ7YodKX9w5SuuBFRZDmBcPQBAqYu6EAec
-nN/wPwBZlbRqqXYDdHebCZmSuDCpjmrthpv1nxPJjpRiqJfFAkEA83cS/HxH1+44
-KwsUxpfYko8yogU+w7PqlRtWauLYAUR5on0g9eD5Bp/T936ERfcCBFbUTZ9+yWYa
-1lIOLJfhJwJBAObCm+iBalIPvzqHvOoQf4eO2xvX1b3V+FxT9b+LuiUqPEMLW6TQ
-lZw16bertfWBofjjm/URdATgdsE5hKgAxBsCQFeiltz3R0z8XI9xz6qkYbpvfQRA
-6xS6oEfHrVWQDbx3D2ljrQeUUU8HHN9LVQVyIfG553WBYbvQ2vwmUR/QE6UCQQC+
-xXxnBzaCiQoqtTT0vJbx1qRFrHXD7zTX/4FWzYkiWHxhYO5unxJQhjGl6osPYBAr
-1t+EBt3Heloy+/4zdg6pAkB7POl1VNVeWvhDP8Oh5EJPVRQXj6owM/qpE4PIkYjH
-I9UW6c8ZiByQek6xXA419ML0ljeTIau3xwWnYpdHKag0
+MIICXQIBAAKBgQC84QPyfYZNO+3vYRkPoLMJ19eH1rizdhpsVedWWAOoWHZ1j9Zk
+Kq96G7MMsDLpq7tbjZDjNO/m0lyj00OR/oRT+HCekOmlNgxnBaMEUbs73RYhIogX
+La1yEg6hOYhIgyHmfIW4qLBAk8/QaV3n2t3CzMpDIN/yVIACVrsoqHnS7wIDAQAB
+AoGAL56fiySAlrpUS7T0R49hdErZySKmoIBXOxcRYyB/k5LyEsO37rsgUK3pH3rQ
+6z7j1rpDXDU9grlop9kcwRMlM0NizRJhwF0ubwMxUmp0Swc+2PiyG3V+3EfvGIk/
+7+2Jt+YgEibn0/t5ua0hseazmshGWUnN98UBdrqTSk4ikEkCQQDN9OhxybFhyRoz
+SfEQEKpXViWKdCVa1xOL1RC+PycyQyGGw50R+F/hhwdbHVThhzn44YBI/E5vy6sd
+LZCo6gDdAkEA6sXTUvgPfHbMMzFm/LV/2fmNsJpdQxVOuVz9qMhsJHSlskjGALHK
+XZHxjtvFxW1BizYgj7tVI9pB76IQBTAgOwJBAMtmCkWODktnQyPR62uVOdUk89BH
+ojiTXe9kDbQFRJ2D5NFl0HJV28MsCly2nARa+yrK8VmjK4eHGceoH0xiRVUCQQDY
+GSefYz297wuew4ZsbhQ064QEXtIhgWdpL7M8vN7t34D1Tg8TbJM89a1HNfwg8aQ3
+I6dtJZ4E1k2C6cWdQOMpAkAXN5lhkNchAq/jFSppNFJSzzg3YPJRWdoC9UiSuLZg
+rEO6FkNJrlYWuB4coaOLRZGbagW/h+xjV62DPw1ylg4s
 -----END RSA PRIVATE KEY-----
 ```
 
@@ -88,6 +108,10 @@ I9UW6c8ZiByQek6xXA419ML0ljeTIau3xwWnYpdHKag0
 如果您不喜欢在本地安装 Golang 环境，只是想简单地将它编译出来尝尝鲜的话，使用 Cloud9 、 Wide 之类的在线环境大概会是一个好选择。
 
 首先在 [https://c9.io](https://c9.io) 注册一个账户并登陆，然后新建一个 Workspace 后即得到了一个在线的编译环境，剩下的操作参考前面的说明即可。
+
+### 关于收费功能模块
+
+因为这只是一个学习用品所以并没有此功能提供，您可以通过在readme中附加联系方式来获得类似的功能。
 
 ## LICENSE
 
