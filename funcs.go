@@ -165,10 +165,11 @@ func (self *Config) init(EncData string) {
 }
 
 func reList(theList []string, count int) []string {
-	tmpList := make([]string, len(theList))
+	length:=len(theList)
+	tmpList := make([]string, length)
 	slNum := rand.Int() % len(theList)
-	copy(tmpList, tmpList[:slNum])
-	copy(tmpList[slNum:], tmpList[slNum:])
+	copy(tmpList[0:length-slNum], theList[slNum:])
+	copy(tmpList[length-slNum:], theList[0:slNum])
 	if count > 1 {
 		return reList(tmpList, count-1)
 	}
