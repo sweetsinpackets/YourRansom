@@ -77,22 +77,40 @@ func decrypt(filename string, cip cipher.Block) error {
 	return nil
 }
 
-func doHandler(cip cipher.Block, ListChan chan string, ExitChan chan bool) {
-	for filename := range ListChan {
-		switch method {
-		case 'e':
-			encrypt(filename, cip)
-		case 'd':
-			decrypt(filename, cip)
+func genHandler(cip cipher.Block, ListChan chan string, ExitChan chan bool) func() {
+	var h = encrypt
+	switch method {
+	case 'e':
+		h = encrypt
+	case 'd':
+		h = decrypt
+	}
+	rfunc := func() {
+		for filename := range ListChan {
+			h(filename, cip)
+			ExitChan <- true
 		}
 	}
-	ExitChan <- true
+	return rfunc
 }
+
+//func doHandler(cip cipher.Block, ListChan chan string, ExitChan chan bool) {
+//	for filename := range ListChan {
+//		switch method {
+//		case 'e':
+//			encrypt(filename, cip)
+//		case 'd':
+//			decrypt(filename, cip)
+//		}
+//	}
+//	ExitChan <- true
+//}
 
 func startHandler(cip cipher.Block, list chan string) {
 	ExitChan := make(chan bool, procNum)
+	hFunc := genHandler(cip, list, ExitChan)
 	for i := 0; i < procNum; i++ {
-		go doHandler(cip, list, ExitChan)
+		go hFunc()
 	}
 	for i := 0; i < procNum; i++ {
 		<-ExitChan
