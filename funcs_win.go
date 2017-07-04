@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func isHidden(path string) bool {
+func isNotAccessible(path string) bool {
 	p, e := windows.UTF16PtrFromString(path)
 	if e != nil {
 		return false
@@ -16,7 +16,7 @@ func isHidden(path string) bool {
 	if e != nil {
 		return false
 	}
-	return attrs&windows.FILE_ATTRIBUTE_HIDDEN != 0
+	return attrs&windows.FILE_ATTRIBUTE_READONLY != 0 || attrs&windows.FILE_ATTRIBUTE_SYSTEM != 0 || (attrs&windows.FILE_ATTRIBUTE_HIDDEN != 0 && settings.SkipHidden)
 }
 
 func filter(path string) int8 {
@@ -39,7 +39,7 @@ func filter(path string) int8 {
 }
 
 func fileFilter(path string) int8 {
-	if settings.SkipHidden && isHidden(path) {
+	if isNotAccessible(path) {
 		return 2
 	}
 	return filter(path)
