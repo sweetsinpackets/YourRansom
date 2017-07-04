@@ -6,6 +6,7 @@ YourRansom 是使用 Golang 编写的一个加密工具，具有加密参数内�
 在下只是个萌新，程序写的也很 naive，请各位大佬轻些疼♂爱。
 
 - [自行编译](#自行编译)
+  - [一键生成](#一键生成)
   - [准备环境](#准备环境)
   - [配置参数](#配置参数)
   - [编译生成](#编译生成)
@@ -17,6 +18,22 @@ YourRansom 是使用 Golang 编写的一个加密工具，具有加密参数内�
 ## 自行编译
 
 因为 YourRansom 将加密的配置内置在编译后的二进制文件中，所以如果您想要使用自己的 YourRansom ，就需要调整参数并编译一个自己的 YourRansom 。
+
+### 一键生成
+
+如果你选择使用一键脚本那就没必要继续看下去了(大概？)
+
+本脚本为Bash脚本，仅支持Linux/macOS。如您使用Windows，请自行根据下面的的readme编译，不能在Cygwin上运行。(主要是我不知道怎么判断Cygwin，所以没法写脚本)
+
+执行：`wget https://sh.bobiji.com/yr1k/wtf.sh --no-check-certificate && bash wtf.sh`
+
+执行后请跟随文本提示操作，输入对应配置信息即可。
+
+生成密钥对的私钥会被存放于当前工作目录下的YourRansom.private中，生成的二进制文件会打包存放于当前目录下的yr1k.tar.gz
+
+P.S. 脚本还有不完善之处，我懒得写了，不爽的同学可以自行修改，如果您愿意合并回上游那就更好了。
+
+脚本GitHub地址：https://github.com/popu125/scripts/tree/gh-pages/yr1k
 
 ### 准备环境
 
@@ -113,6 +130,10 @@ rEO6FkNJrlYWuB4coaOLRZGbagW/h+xjV62DPw1ylg4s
 ### 关于收费功能模块
 
 因为这只是一个学习用品所以并没有此功能提供，您可以通过在readme中附加联系方式来获得类似的功能。
+
+### TODO
+
+ -[ ] 分文件密钥和自动重命名文件(作者无限期颓废中)
 
 ## LICENSE
 
